@@ -74,6 +74,9 @@ console.log(result);
   4. [kmeans-sample-test-04-Maximazation](https://scrimba.com/c/czZV4Hd)
   5. [kmeans-sample-test-05-왜곡 측정 및 Iteration](https://scrimba.com/c/cEaDPuK)  
 
+## source - java : https://github.com/xetorthio/kmeans
+// todo
+
 ## source - java : http://ai-times.tistory.com/158
  ```java
  package xminer.mining.clustering;
