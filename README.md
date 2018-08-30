@@ -2,18 +2,135 @@
    - 패턴 공간에 주어진 유한 개의 패턴들이 서로 가깝게 모여서 무리를 이루고 있는 패턴 집합을 묶는 과정.
 
 ## K-MEANS (KMEANS)란?
+   - [K-평균알고리즘 - WIKI](https://ko.wikipedia.org/wiki/K-평균_알고리즘)
+
    - 주어진 데이터를 k개의 군집(클러스터:Clustering)로 묶는 알고리즘.
    - 각 클러스터와 거리 차이의 분산을 최소화하는 방식으로 동작.
    - 거리에 기반을 둔 clustering 기법
    - 기준점에 가까운 곳의 데이터들을 하나의 군집으로 묶는 방법.
    - 비지도학습 : Unsupervised Learning - [참고](https://ko.wikipedia.org/wiki/비_지도_학습)
 
-## K-MEANS 수행과정
-  - 임의의 "K개 중심값" 설정.
-  - 전체 데이터와 "K개 중심값"을 비교, 가장 가까운 군집(K)에 소속.
-  - 군집된 데이터를 기준으로 군집중앙의 위치를 제 설정.
-  - 새롭개 구한 "k개 중심값"이 기존과 동일하면 알고리즘 종료.
-  :: 이 과정을 통하여 K개의 군집으로 데이터를 구분.
+## K-MEANS 수행과정1
+  1. 임의의 "K개 중심값" 설정.
+  2. 전체 데이터와 "K개 중심값"을 비교, 가장 가까운 군집(K)에 소속.
+  3. 군집된 데이터를 기준으로 군집중앙의 위치를 제 설정.
+  4. 새롭개 구한 "k개 중심값"이 기존과 동일하면 알고리즘 종료.
+     :: 이 과정을 통하여 K개의 군집으로 데이터를 구분.
+# AA     
+  1. 초기 중심값(init Centroid) 초기화.
+     * 알고리즘 : https://ko.wikipedia.org/wiki/K-평균_알고리즘#초기화_기법
+        - Random Partition
+        - Forgy, MacQueen
+        - Kaufman
+  2. Data간 거리 계산
+     1. 초기 중심값(init Centroid) 과 Data간 거리 계산.
+        * [유클리드 거리(Euclidean distance)](https://ko.wikipedia.org/wiki/유클리드_거리)
+        ```JavaScript
+        /* 초기 중심값과 Data의 거리 비교.
+          - 초기 중심값 : center
+          - Data       : dataset
+          >> distance(dataset[n], center[k]);
+        */
+        let c = [];
+        for(let n = 0 ; n < dataset.length ; n++) {
+            let x = dataset[n];
+            let minDist = -1, rn = 0;
+            for(let k = 0 ; k < center.length ; k++) {
+                let dist = distance(dataset[n], center[k]);
+                if(minDist === -1 || minDist > dist) {
+                    minDist = dist;
+                    cn = k;
+                }
+            }
+            c[n] = cn;
+        }        
+        // c : 클러스터링 분류정보 (0~K)
+        ```
+
+     2. 거리가 가까운 군집에 Data를 분류.
+        ```JavaScript
+        c[n] = rn;
+        ```        
+     3. 중심점 최적화 및 왜곡측정.
+        * 왜곡측정 : 거리의 합을 비교.
+        1. 중심점 계산 :centroid();
+        2. 왜곡측정 : 중심점과 Data간 최소거리의합과 이전최소거리의 합의 변화를 비교함.
+        ```JavaScript
+        let preJ = 0;
+        while(true) {
+            let c = centroid();
+
+            // 왜곡측정 : 거리의 합을 이용.
+            let J = 0;
+            for(let n = 0 ; n < dataset.length ; n++) {
+                let x = dataset[n];
+                let minDist = -1;
+                for(let k = 0 ; k < center.length ; k++) {
+                    let dist = distance(dataset[n], center[k]);
+                    if(minDist === -1 || minDist > dist) {
+                        minDist = dist;
+                    }
+                }
+                J += minDist;
+            }
+
+            // 이전값과 비교하여 차이가 없으면 종료
+            let diff = Math.abs(preJ - J);
+            if(diff <= 0) {
+                console.info("last-cluster",c);        
+                break;
+            } else {
+                //debugger;
+                //console.info(diff,preJ,J);
+            }
+            preJ = J;
+        };
+
+        function centroid() {
+            let c = [];
+            for(let n = 0 ; n < dataset.length ; n++) {
+                let x = dataset[n];
+                let minDist = -1, cn = 0;
+                for(let k = 0 ; k < center.length ; k++) {
+                    let dist = distance(dataset[n], center[k]);
+                    if(minDist === -1 || minDist > dist) {
+                        minDist = dist;
+                        cn = k;
+                    }
+                }
+                c[n] = cn;
+            }
+
+            //center null 초기화
+            center = Array.apply(null, Array(center.length));
+            let clusterCount = Array.apply(null, Array(center.length)).map(Number.prototype.valueOf, 0);
+
+            for(let n = 0 ; n < dataset.length ; n++) {
+                let k = c[n] * 1;
+                let x = dataset[n];
+
+                if(!center[k]) center[k] = {};
+
+                //for(let key in x) {
+                for ( let key = 0;key<x.length; key++) {
+                    if(!center[k][key]) center[k][key] = 0;
+                    center[k][key] += x[key] * 1;
+                }
+                //console.info("clusterCount["+k+"]",clusterCount[k]);
+                clusterCount[k]++;
+            }
+
+            for(let k = 0 ; k < center.length ; k++) {
+                for(let _key in center[k]) {
+                    center[k][_key] = center[k][_key] / clusterCount[k * 1];
+                    //console.info("center["+k+"]["+_key+"]",center[k][_key]);        
+                }
+            }
+            //console.info("re---center",center);
+            return c;
+        }
+        ```
+   4. 왜곡이 있는동안 "3.중심점 최적화 및 왜곡측정." 반복 수행.
 
 ##  Language별 구현체
    * Java
@@ -54,6 +171,186 @@
      - Based on density probability.  
      - Can handle both numeric and nominal attributes.
 
+## source - javascript 구현소스 (원본 : https://proinlab.com/archives/2134)
+   1. [kmeans-sample-test-01-Find Centroid](https://scrimba.com/c/cPwp3hZ)
+   2. [kmeans-sample-test-02-Euclidean Distance](https://scrimba.com/c/cb3ZJHa)
+   3. [kmeans-sample-test-03-Expectation](https://scrimba.com/c/cvLVvsn)
+   4. [kmeans-sample-test-04-Maximazation](https://scrimba.com/c/czZV4Hd)
+   5. [kmeans-sample-test-05-왜곡 측정 및 Iteration](https://scrimba.com/c/cEaDPuK)  
+
+```javascript
+function kmeans(k,dataset) {
+    let center = [];
+    let preRand = {}; // 중복된 center가 존재하지 않도록 점검
+    while(true) { // k개의 데이터가 선택될 때까지 실행
+        let rand = Math.floor(Math.random() * dataset.length);
+        if(preRand[rand]) continue;
+        if(dataset[rand]) {
+            center.push(dataset[rand]);
+            preRand[rand] = true;
+        }
+        if(center.length == k) break;
+    }
+    //center.sort();
+    // console.log("init-center",center);
+    center[5,15,25];
+    let distance = (x, y)=> {
+        let sum = 0;
+        let keys = {};
+        for(let key in x) keys[key] = true;
+        for(let key in y) keys[key] = true;
+        //console.info("keys",keys);
+        for(let key in keys) {
+            let xd = x[key] ? x[key] * 1 : 0;
+            let yd = y[key] ? y[key] * 1 : 0;
+            sum += (xd - yd) * (xd - yd);
+        }
+
+        return Math.sqrt(sum);
+    };
+
+    //console.info(distance([1,2,3],[1]));
+    //console.info("init-cluster-let r",r)
+    function centroid() {
+        let c = [];
+        for(let n = 0 ; n < dataset.length ; n++) {
+            let x = dataset[n];
+            let minDist = -1, cn = 0;
+            for(let k = 0 ; k < center.length ; k++) {
+                let dist = distance(dataset[n], center[k]);
+                if(minDist === -1 || minDist > dist) {
+                    minDist = dist;
+                    cn = k;
+                }
+            }
+            c[n] = cn;
+        }
+
+        //center null 초기화
+        center = Array.apply(null, Array(center.length));
+        let clusterCount = Array.apply(null, Array(center.length)).map(Number.prototype.valueOf, 0);
+
+        for(let n = 0 ; n < dataset.length ; n++) {
+            let k = c[n] * 1;
+            let x = dataset[n];
+
+            if(!center[k]) center[k] = {};
+
+            //for(let key in x) {
+            for ( let key = 0;key<x.length; key++) {
+                if(!center[k][key]) center[k][key] = 0;
+                center[k][key] += x[key] * 1;
+            }
+            //console.info("clusterCount["+k+"]",clusterCount[k]);
+            clusterCount[k]++;
+        }
+
+        for(let k = 0 ; k < center.length ; k++) {
+            for(let _key in center[k]) {
+                center[k][_key] = center[k][_key] / clusterCount[k * 1];
+                //console.info("center["+k+"]["+_key+"]",center[k][_key]);        
+            }
+        }
+        //console.info("re---center",center);
+        return c;
+    }
+    //////////////// //////////////// //////////////// //////////////// ////////////////
+
+    centroid();
+
+    let preJ = 0;
+    let c = [];
+    while(true) {
+        c = centroid();
+
+        // 왜곡측정 : 거리의 합을 이용.
+        let J = 0;
+        for(let n = 0 ; n < dataset.length ; n++) {
+            let x = dataset[n];
+            let minDist = -1;
+            for(let k = 0 ; k < center.length ; k++) {
+                let dist = distance(dataset[n], center[k]);
+                if(minDist === -1 || minDist > dist) {
+                    minDist = dist;
+                }
+            }
+            J += minDist;
+        }
+
+        // 이전값과 비교하여 차이가 없으면 종료
+        let diff = Math.abs(preJ - J);
+        if(diff <= 0) {
+            console.info("last-cluster",c);        
+            break;
+        } else {
+            //debugger;
+            //console.info(diff,preJ,J);
+        }
+        preJ = J;
+    };
+    return c;
+}
+
+let dataset = [
+    [	1	,				]	,
+	[	2	,				]	,
+	[	3	,				]	,
+	[	4	,				]	,
+	[	5	,				]	,
+	[	6	,				]	,
+	[	14	,				]	,
+	[	15	,				]	,
+	[	16	,				]	,
+	[	17	,				]	,
+	[	18	,				]	,
+	[	19	,				]	,
+	[	20	,				]	,
+	[	21	,				]	,
+	[	22	,				]	,
+	[	23	,				]	,
+	[	24	,				]	,
+	[	25	,				]	,
+	[	26	,				]	,
+	[	27	,				]	,
+	[	28	,				]	,
+	[	7	,				]	,
+	[	8	,				]	,
+	[	9	,				]	,
+	[	10	,				]	,
+	[	11	,				]	,
+	[	12	,				]	,
+	[	13	,				]	,    
+	[	29	,				]	,
+	[	30					]
+];
+
+for (var i=0;i<1;i++) {
+    let c = kmeans(3,dataset);
+    let v0 = c.map(function(r,idx){
+        //console.info(r,idx);
+        if ( r == 0 ) {
+            return dataset[idx][0];
+        }
+    }).filter(function(data) {return data !=null} );
+    console.info("cluster 0", v0);
+    let v1 = c.map(function(r,idx){
+        //console.info(r,idx);
+        if ( r == 1 ) {
+            return dataset[idx][0];
+        }
+    }).filter(function(data) {return data !=null} );
+    console.info("cluster 1", v1);
+    let v2 = c.map(function(r,idx){
+        //console.info(r,idx);
+        if ( r == 2 ) {
+            return dataset[idx][0];
+        }
+    }).filter(function(data) {return data !=null} );  
+    console.info("cluster 2", v2);
+}
+//kmeans(3,dataset);
+```
+
 ## source - nodeml (nodejs)
 ```javascript
 'use strict';
@@ -67,18 +364,11 @@ result = knn.test(bulk.dataset);
 
 console.log(result);
 ```
-## source - javascript 구현소스 (원본 : https://proinlab.com/archives/2134)
-  1. [kmeans-sample-test-01-Find Centroid](https://scrimba.com/c/cPwp3hZ)
-  2. [kmeans-sample-test-02-Euclidean Distance](https://scrimba.com/c/cb3ZJHa)
-  3. [kmeans-sample-test-03-Expectation](https://scrimba.com/c/cvLVvsn)
-  4. [kmeans-sample-test-04-Maximazation](https://scrimba.com/c/czZV4Hd)
-  5. [kmeans-sample-test-05-왜곡 측정 및 Iteration](https://scrimba.com/c/cEaDPuK)  
-
 ## source - java : https://github.com/xetorthio/kmeans
-// todo
 
 ## source - java : http://ai-times.tistory.com/158
  ```java
+ // 출처: http://ai-times.tistory.com/158 [ai-times]
  package xminer.mining.clustering;
 
  import xminer.core.*;
@@ -243,5 +533,4 @@ console.log(result);
    }
 
  }
-// 출처: http://ai-times.tistory.com/158 [ai-times]
- ```
+```
