@@ -365,6 +365,66 @@ result = knn.test(bulk.dataset);
 
 console.log(result);
 ```
+
+## source - nodeml (nodejs2)
+```JavaScript
+const {sample, kMeans, evaluate} = require('nodeml');
+const bulk = sample.iris();
+//console.info(bulk.dataset);
+let kmeans = new kMeans();
+//
+// kmeans.train(bulk.dataset, {k: 2});
+// result = kmeans.test(bulk.dataset);
+
+var dataset1 = [
+[ '5.1', '4.2', '1.4', '0.2' ],   // 0
+[ '1.5', '4.2', '1.4', '0.2' ],   //        2
+[ '2.5', '4.2', '1.4', '0.2' ],   //        2
+[ '3.5', '4.2', '1.4', '0.2' ],   //        2
+[ '10.5', '4.2', '1.4', '0.2' ],  // 0
+[ '0.5', '4.2', '1.4', '0.2' ],   //    1
+[ '4.5', '4.2', '1.4', '0.2' ],   // 0
+[ '5.5', '4.2', '1.4', '0.2' ],   // 0
+[ '0.1', '4.2', '1.4', '0.2' ],   //    1
+[ '5.5', '4.2', '1.4', '0.2' ],   // 0
+[ '4.9', '3.1', '1.5', '0.1' ]    // 0
+];
+
+var dataset2 = [
+    ['5.1'  , '1' ], //     2
+    ['1.5'  , '1' ], //         0
+    ['2.5'  , '1' ], //         0
+    ['3.5'  , '1' ], //     2
+    ['10.5' , '1' ], // 1
+    ['0.5'  , '1' ], //         0
+    ['4.5'  , '1' ], //     2
+    ['5.5'  , '1' ], //     2
+    ['0.1'  , '1' ], //         0
+    ['5.5'  , '1' ], //     2
+    ['4.9'  , '1' ]  //     2
+];
+kmeans.train(dataset2, {k: 3});
+var result2 = kmeans.test(dataset2);
+console.log(result2);
+
+var dataset3 = [
+    ['5.1'  , '1' ], //     2
+    ['1.5'  , '0' ], //         0
+    ['2.5'  , '1' ], //         0
+    ['3.5'  , '3' ], //     2
+    ['10.5' , '5' ], // 1
+    ['0.5'  , '0' ], //         0
+    ['4.5'  , '8' ], //     2
+    ['5.5'  , '6' ], //     2
+    ['0.1'  , '5' ], //         0
+    ['5.5'  , '4' ], //     2
+    ['4.9'  , '3' ]  //     2
+];
+kmeans.train(dataset3, {k: 3});
+var result3 = kmeans.test(dataset3);
+console.log(result3);
+```
+
 ## source - java
 - [Apache Commons Math](http://commons.apache.org/proper/commons-math/download_math.cgi) - [Overview](http://commons.apache.org/proper/commons-math/userguide/ml.html)
 
