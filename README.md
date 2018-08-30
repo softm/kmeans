@@ -16,7 +16,8 @@
   3. 군집된 데이터를 기준으로 군집중앙의 위치를 제 설정.
   4. 새롭개 구한 "k개 중심값"이 기존과 동일하면 알고리즘 종료.
      :: 이 과정을 통하여 K개의 군집으로 데이터를 구분.
-# AA     
+
+# 수행과정 - javascript
   1. 초기 중심값(init Centroid) 초기화.
      * 알고리즘 : https://ko.wikipedia.org/wiki/K-평균_알고리즘#초기화_기법
         - Random Partition
@@ -363,6 +364,73 @@ kmeans.train(bulk.dataset, {k: 3});
 result = knn.test(bulk.dataset);
 
 console.log(result);
+```
+## source - java
+- [Apache Commons Math](http://commons.apache.org/proper/commons-math/download_math.cgi) - [Overview](http://commons.apache.org/proper/commons-math/userguide/ml.html)
+
+```java
+import org.apache.commons.math3.ml.clustering.Cluster;
+import org.apache.commons.math3.ml.clustering.Clusterer;
+import org.apache.commons.math3.ml.clustering.DoublePoint;
+import org.apache.commons.math3.ml.clustering.KMeansPlusPlusClusterer;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class TestClusterer
+{
+	@Test
+	public void test1() throws Exception {
+		for (int i=0;i<10;i++) {		
+		Clusterer<DoublePoint> clusterer = new KMeansPlusPlusClusterer<DoublePoint>(3);
+		List<DoublePoint> list = new ArrayList<DoublePoint>();
+
+		list.add(new DoublePoint(new double[]{	1	}));
+		list.add(new DoublePoint(new double[]{	2	}));
+		list.add(new DoublePoint(new double[]{	3	}));
+		list.add(new DoublePoint(new double[]{	4	}));
+		list.add(new DoublePoint(new double[]{	5	}));
+		list.add(new DoublePoint(new double[]{	6	}));
+		list.add(new DoublePoint(new double[]{	7	}));
+		list.add(new DoublePoint(new double[]{	8	}));
+		list.add(new DoublePoint(new double[]{	9	}));
+		list.add(new DoublePoint(new double[]{	10	}));
+		list.add(new DoublePoint(new double[]{	11	}));
+		list.add(new DoublePoint(new double[]{	12	}));
+		list.add(new DoublePoint(new double[]{	13	}));
+		list.add(new DoublePoint(new double[]{	14	}));
+		list.add(new DoublePoint(new double[]{	15	}));
+		list.add(new DoublePoint(new double[]{	16	}));
+		list.add(new DoublePoint(new double[]{	17	}));
+		list.add(new DoublePoint(new double[]{	18	}));
+		list.add(new DoublePoint(new double[]{	19	}));
+		list.add(new DoublePoint(new double[]{	20	}));
+		list.add(new DoublePoint(new double[]{	21	}));
+		list.add(new DoublePoint(new double[]{	22	}));
+		list.add(new DoublePoint(new double[]{	23	}));
+		list.add(new DoublePoint(new double[]{	24	}));
+		list.add(new DoublePoint(new double[]{	25	}));
+		list.add(new DoublePoint(new double[]{	26	}));
+		list.add(new DoublePoint(new double[]{	27	}));
+		list.add(new DoublePoint(new double[]{	28	}));
+		list.add(new DoublePoint(new double[]{	29	}));
+		list.add(new DoublePoint(new double[]{	30	}));
+
+//		System.out.println(list);
+
+		List<? extends Cluster<DoublePoint>> res = clusterer.cluster(list);
+//		System.out.println("!!!");
+//		System.out.println(res.size());
+		//System.out.println(res.toString());
+			int seq = 0;
+			for (Cluster<DoublePoint> re : res) {
+				System.out.print(re.getPoints() + " / ");
+				seq++;
+				if ( seq % 3 == 0) System.out.print("\n");				
+			}
+		}
+	}
 ```
 ## source - java : https://github.com/xetorthio/kmeans
 
