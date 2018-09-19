@@ -18,15 +18,16 @@
      :: 이 과정을 통하여 K개의 군집으로 데이터를 구분.
 
 # 수행과정 - javascript
-  1. 초기 중심값(init Centroid) 초기화.
-     * 알고리즘 : https://ko.wikipedia.org/wiki/K-평균_알고리즘#초기화_기법
-        - Random Partition
-        - Forgy, MacQueen
-        - Kaufman
-  2. Data간 거리 계산
-     1. 초기 중심값(init Centroid) 과 Data간 거리 계산.
-        * [유클리드 거리(Euclidean distance)](https://ko.wikipedia.org/wiki/유클리드_거리)
-        ```JavaScript
+###**1. 초기 중심값(init Centroid) 초기화.**
+   * 알고리즘 : https://ko.wikipedia.org/wiki/K-평균_알고리즘#초기화_기법
+      - Random Partition
+      - Forgy, MacQueen
+      - Kaufman
+      
+###**2. Data간 거리 계산 및 분류**
+**1. 초기 중심값(init Centroid) 과 Data간 거리 계산.**
+  * [유클리드 거리(Euclidean distance)](https://ko.wikipedia.org/wiki/유클리드_거리)
+```JavaScript
         /* 초기 중심값과 Data의 거리 비교.
           - 초기 중심값 : center
           - Data       : dataset
@@ -46,92 +47,95 @@
             c[n] = cn;
         }        
         // c : 클러스터링 분류정보 (0~K)
-        ```
+```
 
-     2. 거리가 가까운 군집에 Data를 분류.
-        ```JavaScript
+**2. 거리가 가까운 군집에 Data를 분류.**
+```JavaScript
         c[n] = rn;
-        ```        
-     3. 중심점 최적화 및 왜곡측정.
-        * 왜곡측정 : 거리의 합을 비교.
-        1. 중심점 계산 :centroid();
-        2. 왜곡측정 : 중심점과 Data간 최소거리의합과 이전최소거리의 합의 변화를 비교함.
-        ```JavaScript
-        let preJ = 0;
-        while(true) {
-            let c = centroid();
+```
 
-            // 왜곡측정 : 거리의 합을 이용.
-            let J = 0;
-            for(let n = 0 ; n < dataset.length ; n++) {
-                let x = dataset[n];
-                let minDist = -1;
-                for(let k = 0 ; k < center.length ; k++) {
-                    let dist = distance(dataset[n], center[k]);
-                    if(minDist === -1 || minDist > dist) {
-                        minDist = dist;
-                    }
-                }
-                J += minDist;
+**3. 중심점 최적화 및 왜곡측정.**
+ - 왜곡측정 : 거리의 합을 비교.
+    1. 중심점 계산 :centroid();
+    2. 왜곡측정 : 중심점과 Data간 최소거리의합과 이전최소거리의 합의 변화를 비교함.
+
+```javaScript
+let preJ = 0;
+while (true) {
+    let c = centroid();
+
+    // 왜곡측정 : 거리의 합을 이용.
+    let J = 0;
+    for (let n = 0; n < dataset.length; n++) {
+        let x = dataset[n];
+        let minDist = -1;
+        for (let k = 0; k < center.length; k++) {
+            let dist = distance(dataset[n], center[k]);
+            if (minDist === -1 || minDist > dist) {
+                minDist = dist;
             }
-
-            // 이전값과 비교하여 차이가 없으면 종료
-            let diff = Math.abs(preJ - J);
-            if(diff <= 0) {
-                console.info("last-cluster",c);        
-                break;
-            } else {
-                //debugger;
-                //console.info(diff,preJ,J);
-            }
-            preJ = J;
-        };
-
-        function centroid() {
-            let c = [];
-            for(let n = 0 ; n < dataset.length ; n++) {
-                let x = dataset[n];
-                let minDist = -1, cn = 0;
-                for(let k = 0 ; k < center.length ; k++) {
-                    let dist = distance(dataset[n], center[k]);
-                    if(minDist === -1 || minDist > dist) {
-                        minDist = dist;
-                        cn = k;
-                    }
-                }
-                c[n] = cn;
-            }
-
-            //center null 초기화
-            center = Array.apply(null, Array(center.length));
-            let clusterCount = Array.apply(null, Array(center.length)).map(Number.prototype.valueOf, 0);
-
-            for(let n = 0 ; n < dataset.length ; n++) {
-                let k = c[n] * 1;
-                let x = dataset[n];
-
-                if(!center[k]) center[k] = {};
-
-                //for(let key in x) {
-                for ( let key = 0;key<x.length; key++) {
-                    if(!center[k][key]) center[k][key] = 0;
-                    center[k][key] += x[key] * 1;
-                }
-                //console.info("clusterCount["+k+"]",clusterCount[k]);
-                clusterCount[k]++;
-            }
-
-            for(let k = 0 ; k < center.length ; k++) {
-                for(let _key in center[k]) {
-                    center[k][_key] = center[k][_key] / clusterCount[k * 1];
-                    //console.info("center["+k+"]["+_key+"]",center[k][_key]);        
-                }
-            }
-            //console.info("re---center",center);
-            return c;
         }
-        ```
-   4. 왜곡이 있는동안 "3.중심점 최적화 및 왜곡측정." 반복 수행.
+        J += minDist;
+    }
+
+    // 이전값과 비교하여 차이가 없으면 종료
+    let diff = Math.abs(preJ - J);
+    if (diff <= 0) {
+        console.info("last-cluster", c);
+        break;
+    } else {
+        //debugger;
+        //console.info(diff,preJ,J);
+    }
+    preJ = J;
+};
+
+function centroid() {
+    let c = [];
+    for (let n = 0; n < dataset.length; n++) {
+        let x = dataset[n];
+        let minDist = -1,
+            cn = 0;
+        for (let k = 0; k < center.length; k++) {
+            let dist = distance(dataset[n], center[k]);
+            if (minDist === -1 || minDist > dist) {
+                minDist = dist;
+                cn = k;
+            }
+        }
+        c[n] = cn;
+    }
+
+    //center null 초기화
+    center = Array.apply(null, Array(center.length));
+    let clusterCount = Array.apply(null, Array(center.length)).map(Number.prototype.valueOf, 0);
+
+    for (let n = 0; n < dataset.length; n++) {
+        let k = c[n] * 1;
+        let x = dataset[n];
+
+        if (!center[k]) center[k] = {};
+
+        //for(let key in x) {
+        for (let key = 0; key < x.length; key++) {
+            if (!center[k][key]) center[k][key] = 0;
+            center[k][key] += x[key] * 1;
+        }
+        //console.info("clusterCount["+k+"]",clusterCount[k]);
+        clusterCount[k]++;
+    }
+
+    for (let k = 0; k < center.length; k++) {
+        for (let _key in center[k]) {
+            center[k][_key] = center[k][_key] / clusterCount[k * 1];
+            //console.info("center["+k+"]["+_key+"]",center[k][_key]);        
+        }
+    }
+    //console.info("re---center",center);
+    return c;
+}
+```
+  **4. 왜곡이 있는동안 "3.중심점 최적화 및 왜곡측정." 반복 수행.**
 
 ##  Language별 구현체
    * Java
